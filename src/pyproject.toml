@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "src"
+version = "0.1.0"
+description = "Test task for MadDevs"
+authors = ["Krasnopolsky Ivan <i1.krasnopolskiy@gmail.com>"]
+readme = "README.md"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.dependencies]
+# Core
+python = "~3.11"
+
+# Computing
+pydantic = "2.3.0"
+pandas-ta = "0.3.14b0"
+
+# Client
+aiohttp = "3.8.5"
+python-binance = "1.0.19"
+pylint = "^2.17.5"
+
+[tool.poetry.group.dev.dependencies]
+# Style
+isort = "5.12.0"
+black = "23.9.1"
