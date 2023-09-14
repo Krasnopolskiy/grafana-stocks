@@ -4,11 +4,13 @@ from binance.streams import ReconnectingWebsocket
 from websockets.exceptions import ConnectionClosed
 
 from schemas.binance import Event, Response
+from utils.influx import persist
 from utils.metrics import calculate_rsi
 
 
 class Binance:
     def __init__(self):
+        self.service = self.__class__.__name__.upper()
         self.symbol = "BTCUSDT"
         self.interval = KLINE_INTERVAL_1SECOND
         self.klines = []
@@ -27,8 +29,15 @@ class Binance:
             event = Event(**message)
             self.klines.append(event.kline)
             rsi = calculate_rsi(self.klines)
-            response = Response(kline=event.kline, rsi=rsi)
+            response = Response(
+                kline=event.kline,
+                rsi=rsi,
+                symbol=self.symbol,
+                interval=self.interval,
+                service=self.service,
+            )
             print(response.model_dump_json())
+            await persist(response)
 
     async def connect(self) -> ReconnectingWebsocket:
         client = await AsyncClient.create()

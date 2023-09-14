@@ -1,11 +1,13 @@
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMessage, WSMsgType
 
 from schemas.bitfinex import Event, Handshake, Response
+from utils.influx import persist
 from utils.metrics import calculate_vwap
 
 
 class Bitfinex:
     def __init__(self):
+        self.service = self.__class__.__name__.upper()
         self.url = "wss://api-pub.bitfinex.com/ws/2"
         self.symbol = "tBTCUSD"
         self.interval = "1m"
@@ -23,8 +25,9 @@ class Bitfinex:
                     event = Event(*data)
                 self.klines.append(event.kline)
                 vwap = calculate_vwap(self.klines)
-                response = Response(kline=event.kline, vwap=vwap)
+                response = Response(kline=event.kline, vwap=vwap, **self.__dict__)
                 print(response.model_dump_json())
+                await persist(response)
 
     async def connect(self, socket: ClientWebSocketResponse):
         key = f"trade:{self.interval}:{self.symbol}"

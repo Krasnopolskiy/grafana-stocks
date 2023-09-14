@@ -19,5 +19,4 @@ class Event(BaseEvent):
 
 
 class Response(BaseResponse):
-    service: str = "binance"
     rsi: float

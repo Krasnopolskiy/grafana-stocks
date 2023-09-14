@@ -16,4 +16,6 @@ class BaseEvent(BaseModel):
 
 class BaseResponse(BaseModel):
     service: str
+    symbol: str
+    interval: str
     kline: BaseKline
