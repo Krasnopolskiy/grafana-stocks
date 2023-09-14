@@ -13,9 +13,9 @@ build-backend = "poetry.core.masonry.api"
 # Core
 python = "~3.11"
 loguru = "^0.7.2"
+pydantic = "2.3.0"
 
 # Computing
-pydantic = "2.3.0"
 pandas-ta = "0.3.14b0"
 
 # Client
