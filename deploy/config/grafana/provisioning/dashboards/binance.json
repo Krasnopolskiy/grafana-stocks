@@ -2,7 +2,7 @@
     "editable": true,
     "fiscalYearStartMonth": 0,
     "graphTooltip": 0,
-    "id": 1,
+    "id": 2,
     "links": [],
     "liveNow": false,
     "panels": [
@@ -214,6 +214,6 @@
     "timezone": "",
     "title": "Binance",
     "uid": "b56eeaec-338e-43b6-babb-5f24c17910b5",
-    "version": 4,
+    "version": 1,
     "weekStart": ""
 }
