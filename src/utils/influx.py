@@ -7,10 +7,10 @@ from pydantic import BaseModel
 
 from schemas.base import BaseResponse
 
-token = os.environ.get("INFLUXDB_TOKEN")
-org = "MadDevs"
-url = "http://127.0.0.1:8086"
-bucket = "MadDevs"
+TOKEN = os.environ.get("INFLUXDB_TOKEN")
+ORG = "MadDevs"
+URL = "http://127.0.0.1:8086"
+BUCKET = "MadDevs"
 
 
 def flatten(model: BaseModel) -> dict:
@@ -30,6 +30,6 @@ def as_point(response: BaseResponse) -> Point:
 
 async def persist(response: BaseResponse):
     point = as_point(response)
-    async with InfluxDBClientAsync(url=url, token=token, org=org) as client:
+    async with InfluxDBClientAsync(url=URL, token=TOKEN, org=ORG) as client:
         write_api = client.write_api()
-        await write_api.write(bucket=bucket, org=org, record=point)
+        await write_api.write(bucket=BUCKET, org=ORG, record=point)

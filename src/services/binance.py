@@ -2,45 +2,39 @@ from binance import AsyncClient, BinanceSocketManager
 from binance.streams import ReconnectingWebsocket
 from websockets.exceptions import ConnectionClosed
 
-from schemas.binance import Event, Response
-from utils.influx import persist
+from schemas.binance import Event
+from services.base import BaseService
 from utils.metrics import calculate_rsi
 
 
-class Binance:
+class Binance(BaseService):
     def __init__(self):
-        self.service = self.__class__.__name__.upper()
         self.symbol = "BTCUSDT"
-        self.interval = '1s'
-        self.klines = []
+        self.interval = "1s"
+        super().__init__()
 
     async def subscribe(self):
-        socket = await self.connect()
-        async with socket as subscription:
+        connection = await self.connect()
+        async with connection as socket:
             try:
-                await self.process(subscription)
+                await self.process(socket)
             except ConnectionClosed:
                 pass
-
-    async def process(self, subscription: ReconnectingWebsocket):
-        while True:
-            message = await subscription.recv()
-            event = Event(**message)
-            if not event.kline.closed:
-                continue
-            self.klines.append(event.kline)
-            rsi = calculate_rsi(self.klines)
-            response = Response(
-                kline=event.kline,
-                rsi=rsi,
-                symbol=self.symbol,
-                interval=self.interval,
-                service=self.service,
-            )
-            print(response.model_dump_json())
-            await persist(response)
 
     async def connect(self) -> ReconnectingWebsocket:
         client = await AsyncClient.create()
         manager = BinanceSocketManager(client)
         return manager.kline_socket(symbol=self.symbol, interval=self.interval)
+
+    def parse(self, message) -> Event | None:
+        event = Event(**message)
+        return event if event.kline.closed else None
+
+    async def process(self, socket: ReconnectingWebsocket):
+        while True:
+            message = await socket.recv()
+            event = self.parse(message)
+            if event is None:
+                continue
+            rsi = self.calculate_metrics(event.kline, calculate_rsi)
+            await self.send(event.kline, rsi=rsi)

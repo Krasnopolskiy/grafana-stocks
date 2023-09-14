@@ -1,33 +1,33 @@
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMessage, WSMsgType
 
-from schemas.bitfinex import Event, Handshake, Response
-from utils.influx import persist
+from schemas.bitfinex import Event, Handshake
+from services.base import BaseService
 from utils.metrics import calculate_vwap
 
 
-class Bitfinex:
+class Bitfinex(BaseService):
     def __init__(self):
-        self.service = self.__class__.__name__.upper()
         self.url = "wss://api-pub.bitfinex.com/ws/2"
         self.symbol = "tBTCUSD"
         self.interval = "1m"
-        self.klines = []
+        super().__init__()
+
+    def parse(self, message: WSMessage) -> Event | None:
+        if message.type != WSMsgType.TEXT:
+            return None
+        try:
+            data = message.json()
+            return Event(*data)
+        except TypeError:
+            return None
 
     async def process(self, socket: ClientWebSocketResponse):
         async for message in socket:
-            message: WSMessage
-            if message.type == WSMsgType.TEXT:
-                data = message.json()
-                try:
-                    event = Event(*data)
-                except TypeError:
-                    data = [0, [1694632440000, 26140, 26140, 26140, 26140, 0.024534]]
-                    event = Event(*data)
-                self.klines.append(event.kline)
-                vwap = calculate_vwap(self.klines)
-                response = Response(kline=event.kline, vwap=vwap, **self.__dict__)
-                print(response.model_dump_json())
-                await persist(response)
+            event = self.parse(await message)
+            if event is None:
+                continue
+            vwap = self.calculate_metrics(event.kline, calculate_vwap)
+            await self.send(event.kline, vwap=vwap)
 
     async def connect(self, socket: ClientWebSocketResponse):
         key = f"trade:{self.interval}:{self.symbol}"
