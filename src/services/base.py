@@ -1,9 +1,11 @@
-from typing import Callable
+from typing import Callable, Type, TypeVar
 
-from schemas.base import BaseEvent, BaseKline
-from schemas.binance import Response
+from loguru import logger
+
+from schemas.base import BaseEvent, BaseKline, BaseResponse
 from utils.influx import persist
 
+T = TypeVar('T', bound=BaseResponse)
 
 class BaseService:
     interval: str
@@ -31,13 +33,13 @@ class BaseService:
         self.klines.append(kline)
         return handler(self.klines)
 
-    async def send(self, kline: BaseKline, **kwargs):
-        response = Response(
+    async def send(self, response: Type[T], kline: BaseKline, **kwargs):
+        response = response(
             kline=kline,
             symbol=self.symbol,
             interval=self.interval,
             service=self.service,
             **kwargs,
         )
-        print(response.model_dump_json())
+        logger.info(response.model_dump_json())
         await persist(response)

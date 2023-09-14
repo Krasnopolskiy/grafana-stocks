@@ -1,6 +1,6 @@
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMessage, WSMsgType
 
-from schemas.bitfinex import Event, Handshake
+from schemas.bitfinex import Event, Handshake, Response
 from services.base import BaseService
 from utils.metrics import calculate_vwap
 
@@ -23,11 +23,11 @@ class Bitfinex(BaseService):
 
     async def process(self, socket: ClientWebSocketResponse):
         async for message in socket:
-            event = self.parse(await message)
+            event = self.parse(message)
             if event is None:
                 continue
             vwap = self.calculate_metrics(event.kline, calculate_vwap)
-            await self.send(event.kline, vwap=vwap)
+            await self.send(Response, event.kline, vwap=vwap)
 
     async def connect(self, socket: ClientWebSocketResponse):
         key = f"trade:{self.interval}:{self.symbol}"

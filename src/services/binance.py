@@ -2,7 +2,7 @@ from binance import AsyncClient, BinanceSocketManager
 from binance.streams import ReconnectingWebsocket
 from websockets.exceptions import ConnectionClosed
 
-from schemas.binance import Event
+from schemas.binance import Event, Response
 from services.base import BaseService
 from utils.metrics import calculate_rsi
 
@@ -37,4 +37,4 @@ class Binance(BaseService):
             if event is None:
                 continue
             rsi = self.calculate_metrics(event.kline, calculate_rsi)
-            await self.send(event.kline, rsi=rsi)
+            await self.send(Response, event.kline, rsi=rsi)
