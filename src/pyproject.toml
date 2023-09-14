@@ -12,6 +12,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 # Core
 python = "~3.11"
+loguru = "^0.7.2"
 
 # Computing
 pydantic = "2.3.0"
@@ -21,9 +22,8 @@ pandas-ta = "0.3.14b0"
 aiohttp = "3.8.5"
 python-binance = "1.0.19"
 
-# Persistant
+# Persistence
 influxdb-client = {extras = ["async"], version = "1.37.0"}
-loguru = "^0.7.2"
 
 [tool.poetry.group.dev.dependencies]
 # Style
