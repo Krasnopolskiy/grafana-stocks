@@ -1,0 +1,40 @@
+version: '3.8'
+
+name: 'maddevs'
+
+services:
+  # loki:
+  #   image: grafana/loki:2.6.0
+  #   command: '-config.file=/etc/loki/loki.yml'
+  #   volumes:
+  #     - ./config/loki/loki.yml:/etc/loki/loki.yml
+  #     - ./data/loki:/loki
+  #   networks:
+  #     - internal
+  #   ports:
+  #     - '3100:3100'
+
+  grafana:
+    image: grafana/grafana:9.5.6
+    user: '0:0'
+    env_file: ./config/.env
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - internal
+    ports:
+      - '3000:3000'
+
+  influx:
+    image: influxdb
+    env_file: ./config/.env
+    volumes:
+      - ./data/influx:/var/lib/influxdb2
+    networks:
+      - internal
+    ports:
+      - '8086:8086'
+
+networks:
+  internal:
