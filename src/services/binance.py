@@ -1,5 +1,4 @@
 from binance import AsyncClient, BinanceSocketManager
-from binance.enums import KLINE_INTERVAL_1SECOND
 from binance.streams import ReconnectingWebsocket
 from websockets.exceptions import ConnectionClosed
 
@@ -12,7 +11,7 @@ class Binance:
     def __init__(self):
         self.service = self.__class__.__name__.upper()
         self.symbol = "BTCUSDT"
-        self.interval = KLINE_INTERVAL_1SECOND
+        self.interval = '1s'
         self.klines = []
 
     async def subscribe(self):
@@ -27,6 +26,8 @@ class Binance:
         while True:
             message = await subscription.recv()
             event = Event(**message)
+            if not event.kline.closed:
+                continue
             self.klines.append(event.kline)
             rsi = calculate_rsi(self.klines)
             response = Response(
