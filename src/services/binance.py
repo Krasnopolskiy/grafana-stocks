@@ -10,7 +10,7 @@ from utils.metrics import calculate_rsi
 class Binance(BaseService):
     def __init__(self):
         self.symbol = "BTCUSDT"
-        self.interval = "1s"
+        self.interval = "5m"
         super().__init__()
 
     async def subscribe(self):

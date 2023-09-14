@@ -13,6 +13,9 @@ def calculate_rsi(records: list[BaseKline], length=14) -> float:
 
 def calculate_vwap(records: list[BaseKline]) -> float:
     frame = pd.DataFrame([record.__dict__ for record in records])
-    frame.index = pd.to_datetime(frame["close_time"], unit="ms")
-    vwap = frame.ta.vwap()
+    frame["cumulative_volume"] = frame["volume"].cumsum()
+    frame["cumulative_volume_price"] = (
+        frame["volume"] * (frame["high_price"] + frame["low_price"] + frame["close_price"]) / 3
+    ).cumsum()
+    vwap = frame['cumulative_volume_price'] / frame['cumulative_volume']
     return float(vwap.iat[-1]) if vwap is not None else 0

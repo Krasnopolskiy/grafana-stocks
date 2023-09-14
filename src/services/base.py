@@ -5,7 +5,8 @@ from loguru import logger
 from schemas.base import BaseEvent, BaseKline, BaseResponse
 from utils.influx import persist
 
-T = TypeVar('T', bound=BaseResponse)
+T = TypeVar("T", bound=BaseResponse)
+
 
 class BaseService:
     interval: str

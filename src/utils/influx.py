@@ -8,9 +8,9 @@ from pydantic import BaseModel
 from schemas.base import BaseResponse
 
 TOKEN = os.environ.get("INFLUXDB_TOKEN")
-ORG = "MadDevs"
-URL = "http://127.0.0.1:8086"
-BUCKET = "MadDevs"
+ORG = os.environ.get("INFLUXDB_ORG")
+BUCKET = os.environ.get("INFLUXDB_BUCKET")
+URL = os.environ.get("INFLUXDB_URL")
 
 
 def flatten(model: BaseModel) -> dict:
