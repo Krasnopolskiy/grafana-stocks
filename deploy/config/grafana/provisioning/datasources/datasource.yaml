@@ -1,0 +1,18 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    uid: influxdb
+    type: influxdb
+    access: proxy
+    isDefault: false
+    url: http://influx:8086
+    jsonData:
+      dbName: MadDevs
+      defaultBucket: MadDevs
+      organization: MadDevs
+      version: Flux
+    secureJsonData:
+      basicAuthPassword: true
+      password: ZJC2s2zgx36rCne9
+      token: 'b4YtL1745Z8GaNvwiZYsitkj7cSPrbNxvQI6nsqVqln4EHGIgrAbLQPM6a_4AuykM_z0WEG0Fly2z0TKK3EI3A=='
